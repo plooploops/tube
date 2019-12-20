@@ -123,10 +123,17 @@ class Parser(BaseParser):
             new_assigned = set([])
             for collector in just_assigned:
                 for child in collector.children:
-                    if len(child.children) == 0 or child in assigned_levels:
+                    #if len(child.children) == 0 or child in assigned_levels:
+                    #    continue
+                    #child.level = level
+                    #new_assigned.add(child)
+
+                    if child in assigned_levels:
                         continue
                     child.level = level
-                    new_assigned.add(child)
+                    if len(child.children) != 0:
+                        new_assigned.add(child)
+
             just_assigned = new_assigned
             assigned_levels = assigned_levels.union(new_assigned)
             level += 1
