@@ -31,7 +31,7 @@ class Writer(SparkBase):
     def reset_status(self):
         self.versioning.reset_status()
 
-    def generate_mapping(self, doc_name, field_types):
+    def generate_mapping(self, doc_name, field_types, settings=None):
         """
         :param doc_name: name of the Elasticsearch document to create mapping for
         :param field_types: dictionary of field and their types
@@ -39,7 +39,10 @@ class Writer(SparkBase):
         """
         properties = settings_util.build_properties(self.config, field_types)
 
-        mapping = {"mappings": {doc_name: {"properties": properties}}}
+        if settings:
+            mapping = {"mappings": {doc_name: {"properties": properties}}, "settings": settings}
+        else:
+            mapping = {"mappings": {doc_name: {"properties": properties}}}
         return mapping
 
     def get_es(self):
@@ -50,13 +53,6 @@ class Writer(SparkBase):
         es_hosts = self.es_config["es.nodes"]
         es_port = self.es_config["es.port"]
         return Elasticsearch([{"host": es_hosts, "port": es_port}])
-
-    def create_new_index(self, index, mappings, settings):
-        body = mappings
-        body["settings"] = settings
-        print("Index: {}, Body: {}".format(index, body))
-        self.es.indices.create(index=index, body=body)
-        return index
 
     def write_to_new_index(self, df, index, doc_type):
         df = df.map(lambda x: json_export(x, doc_type))
@@ -124,7 +120,7 @@ class Writer(SparkBase):
                 df = df.map(lambda x: plugin(x))
 
             types = add_auth_resource_path_mapping(types)
-            mapping = self.generate_mapping(doc_type, types)
+            mapping = self.generate_mapping(doc_type, types, self.settings)
 
             index_name = self.versioning.get_next_index_version(index)
             print(
@@ -133,7 +129,7 @@ class Writer(SparkBase):
                 )
             )
             self.reset_status()
-            index_to_write = self.create_new_index(index_name, mapping, self.settings,)
+            index_to_write = self.versioning.create_new_index(index_name, mapping)
             self.write_to_new_index(df, index_to_write, doc_type)
             self.versioning.putting_new_version_tag(index_to_write, index)
             putting_timestamp(self.es, index_to_write)
