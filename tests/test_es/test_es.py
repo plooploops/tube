@@ -16,7 +16,7 @@ from tests.value.value import value_diff
 @pytest.fixture
 def init_interpreter():
     interpreter = create_translators(None, config)
-    print("Interpreter: {}".format(vars(interpreter)))
+    print("Interpreter: {}".format(interpreter))
 
 
 @pytest.mark.parametrize(
