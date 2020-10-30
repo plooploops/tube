@@ -17,6 +17,7 @@ from tests.value.value import value_diff
 def init_interpreter():
     interpreter = create_translators(None, config)
     print("Interpreter: {}".format(interpreter))
+    return interpreter
 
 
 @pytest.mark.parametrize(
