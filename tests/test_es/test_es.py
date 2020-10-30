@@ -15,7 +15,8 @@ from tests.value.value import value_diff
 
 @pytest.fixture
 def init_interpreter():
-    return create_translators(None, config)
+    interpreter = create_translators(None, config)
+    print("Interpreter: {}".format(vars(interpreter)))
 
 
 @pytest.mark.parametrize(
@@ -47,9 +48,9 @@ def test_es_types(init_interpreter, doc_type):
     interpreter = init_interpreter
     parser = interpreter[doc_type].parser
     es = Elasticsearch([{"host": config.ES["es.nodes"], "port": config.ES["es.port"]}])
-
-    indices = client.IndicesClient(es)
-    index_name = list(indices.get_alias(name=parser.name).keys())[0]
+    print(es.indices.get_alias())
+    print("parser name: {}".format(parser.name))
+    index_name = list(es.indices.get_alias(name=parser.name).keys())[0]
 
     mapping = indices.get_mapping(index=index_name)
 
