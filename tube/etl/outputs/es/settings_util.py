@@ -53,4 +53,14 @@ def build_properties(config, field_types):
     # explicitly map 'node_id'
     properties["node_id"] = {"type": "keyword"}
 
+    print(properties)
+
+    orig_properties = {
+        k: {"type": es_type[v[0]]}
+        if v[0] is not str
+        else {"type": es_type[v[0]], "fields": {"analyzed": {"type": "text"}}}
+        for k, v in list(field_types.items())
+    }
+    print(orig_properties)
+
     return properties

@@ -30,6 +30,7 @@ def find_path(file_name, app_name, search_folders=None):
     search_folders = search_folders or default_search_folders(app_name)
     possible_files = [os.path.join(folder, file_name) for folder in search_folders]
     paths = [path for path in possible_files if os.path.exists(path)]
+    print(paths)
     if not paths:
         return []
     return paths[0]

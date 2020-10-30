@@ -53,6 +53,7 @@ class Writer(SparkBase):
 
     def create_new_index(self, index, mappings, settings):
         body = dict(mappings=mappings, settings=settings)
+        print("Index: {}, Body: {}".format(index, body))
         self.es.indices.create(index=index, body=body)
         return index
 
@@ -124,10 +125,14 @@ class Writer(SparkBase):
             types = add_auth_resource_path_mapping(types)
             mapping = self.generate_mapping(doc_type, types)
 
-            self.reset_status()
-            index_to_write = self.create_new_index(
-                self.versioning.get_next_index_version(index), mapping, self.settings,
+            index_name = self.versioning.get_next_index_version(index)
+            print(
+                "Types: {},\n mapping: {},\n index_name: {}\n".format(
+                    types, mapping, index_name
+                )
             )
+            self.reset_status()
+            index_to_write = self.create_new_index(index_name, mapping, self.settings,)
             self.write_to_new_index(df, index_to_write, doc_type)
             self.versioning.putting_new_version_tag(index_to_write, index)
             putting_timestamp(self.es, index_to_write)
