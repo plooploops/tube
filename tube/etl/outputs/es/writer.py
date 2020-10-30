@@ -52,7 +52,8 @@ class Writer(SparkBase):
         return Elasticsearch([{"host": es_hosts, "port": es_port}])
 
     def create_new_index(self, index, mappings, settings):
-        body = dict(mappings=mappings, settings=settings)
+        body = mappings
+        body["settings"] = settings
         print("Index: {}, Body: {}".format(index, body))
         self.es.indices.create(index=index, body=body)
         return index
