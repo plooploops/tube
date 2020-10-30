@@ -35,6 +35,8 @@ install:
 before_script:
   - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
+  - export ES_URL="localhost"
+  - export ES_INDEX_NAME="etl"
   - export REPOSITORY=cdis/tube
   - ./wait_for_quay.sh -r ${REPOSITORY} -b ${BRANCH//\//_} -d 30
   - export XDG_DATA_HOME="$HOME/.local/share"
@@ -61,8 +63,6 @@ before_script:
   - docker-compose logs
   - docker-compose run tube bash -c "python run_config.py; python run_etl.py"
   - cd -
-  - export ES_URL="localhost"
-  - export ES_INDEX_NAME="etl"
 
 script:
   - python -m pytest -v tests
