@@ -83,7 +83,8 @@ class Writer(SparkBase):
                         "array": {"type": "keyword"},
                     }
                 }
-            }
+            },
+            "settings": self.settings
         }
 
         latest_transaction_time = get_latest_utc_transaction_time()
@@ -95,8 +96,8 @@ class Writer(SparkBase):
 
         try:
             self.reset_status()
-            index_to_write = self.create_new_index(
-                self.versioning.get_next_index_version(index), mapping, self.settings
+            index_to_write = self.versioning.create_new_index(
+                self.versioning.get_next_index_version(index), mapping
             )
             self.es.index(index_to_write, "_doc", id=etl_index_name, body=doc)
             self.versioning.putting_new_version_tag(index_to_write, index)
