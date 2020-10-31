@@ -97,7 +97,7 @@ class Writer(SparkBase):
         try:
             self.reset_status()
             index_to_write = self.versioning.create_new_index(
-                self.versioning.get_next_index_version(mapping, index)
+                mapping, self.versioning.get_next_index_version(index)
             )
             self.es.index(index_to_write, "_doc", id=etl_index_name, body=doc)
             self.versioning.putting_new_version_tag(index_to_write, index)
