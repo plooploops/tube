@@ -97,7 +97,7 @@ class Writer(SparkBase):
         try:
             self.reset_status()
             index_to_write = self.versioning.create_new_index(
-                self.versioning.get_next_index_version(index), mapping
+                self.versioning.get_next_index_version(mapping, index)
             )
             self.es.index(index_to_write, "_doc", id=etl_index_name, body=doc)
             self.versioning.putting_new_version_tag(index_to_write, index)
@@ -130,7 +130,7 @@ class Writer(SparkBase):
                 )
             )
             self.reset_status()
-            index_to_write = self.versioning.create_new_index(index_name, mapping)
+            index_to_write = self.versioning.create_new_index(mapping, index_name)
             self.write_to_new_index(df, index_to_write, doc_type)
             self.versioning.putting_new_version_tag(index_to_write, index)
             putting_timestamp(self.es, index_to_write)
