@@ -53,7 +53,7 @@ def test_es_types(init_interpreter, doc_type):
     print("parser name: {}".format(parser.name))
     index_name = list(es.indices.get_alias(name=parser.name).keys())[0]
 
-    mapping = indices.get_mapping(index=index_name)
+    mapping = es.indices.get_mapping(index=index_name)
 
     for k, t in list(mapping[index_name]["mappings"][doc_type]["properties"].items()):
         assert t["type"] != "text"
