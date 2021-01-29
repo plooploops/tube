@@ -48,6 +48,24 @@ class Translator(object):
             print("HAPPEN WITH NODE: {}".format(table_name))
             print(ex)
 
+    def translate_table_to_dataframe(self, node, props=None):
+        node_tbl_name = node.tbl_name
+        node_name = node.name
+        try:
+            df = self.sc.wholeTextFiles(
+                os.path.join(self.hdfs_path, node_tbl_name)
+            ).flatMap(flatten_files_to_lists)
+            df = df.map(lambda x: extract_metadata_to_json(x, node_name))
+            if df is None or df.isEmpty():
+                return None
+            new_df = self.sql_context.read.json(df)
+            if props is None:
+                return new_df
+            return new_df
+        except Exception as ex:
+            print("HAPPEN WITH NODE: {}".format(node_tbl_name))
+            print(ex)
+
     def translate_edge(self, table_name, reversed=True):
         """
         Return the edge table that has two columns.
