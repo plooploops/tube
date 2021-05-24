@@ -49,3 +49,12 @@ def save_rdd_of_dataframe(df, path, sc):
     fs, opath, sc = get_hdfs_file_handler(sc)
     fs.delete(opath(path), True)
     df.write.parquet(path)
+
+
+def get_all_files(path, sc):
+    fs, opath, sc = get_hdfs_file_handler(sc)
+    status = fs.listStatus(opath(path))
+    files = []
+    for p in status:
+        files.append(p.getPath().toString())
+    return files

@@ -10,7 +10,7 @@ from .lambdas import (
     get_props_empty_values,
     get_number,
 )
-from tube.utils.spark import save_rdd_of_dataframe
+from tube.utils.spark import save_rdd_of_dataframe, get_all_files
 from pyspark.sql.context import SQLContext
 from pyspark.sql.types import StructType, StructField, StringType
 from tube.utils.general import get_node_id_name
@@ -55,11 +55,30 @@ class Translator(object):
         rm_props = [p for p in df.schema.names if p not in keep_props]
         return df.drop(*rm_props)
 
+    def read_text_files_of_table(self, table_name, fn_frame_zero):
+        files = get_all_files(os.path.join(self.hdfs_path, table_name), self.sc)
+        if len(files) == 0:
+            return fn_frame_zero(), True
+        if len(files) > 0:
+            df = self.sc.textFile(files[0])
+        if len(files) > 1:
+            for f in files[1:]:
+                df = df.union(self.sc.textFile(f))
+        return df, False
+
+    def get_frame_zero_rdd(self):
+        df = self.sc.parallelize(
+            [("__BLANK_ID__", "__BLANK_VALUE__")]
+        )  # to create the frame for empty node
+        return df.mapValues(lambda x: [])
+
     def translate_table(self, table_name, get_zero_frame=None, props=None):
         try:
-            df = self.sc.wholeTextFiles(
-                os.path.join(self.hdfs_path, table_name)
-            ).flatMap(flatten_files_to_lists)
+            df, is_empty = self.read_text_files_of_table(
+                table_name, self.get_zero_frame_rdd
+            )
+            if is_empty:
+                return df
             df = df.map(extract_metadata)
 
             if get_zero_frame:
@@ -88,9 +107,11 @@ class Translator(object):
         node_tbl_name = node.tbl_name
         node_name = node.name
         try:
-            df = self.sc.wholeTextFiles(
-                os.path.join(self.hdfs_path, node_tbl_name)
-            ).flatMap(flatten_files_to_lists)
+            df, is_empty = self.read_text_files_of_table(
+                node_tbl_name, self.get_empty_dateframe_with_name
+            )
+            if is_empty:
+                return df
             if key_name is None:
                 df = df.map(lambda x: extract_metadata_to_json(x, node_name))
             else:
