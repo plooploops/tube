@@ -15,7 +15,7 @@ def extract_metadata(str_value):
     strs = ast.literal_eval(str_value.replace('""', "'"))
     try:
         props = json.loads(
-            strs[3].replace("'", '"').replace("###", "'").replace("##", '\\"'),
+            strs[3].replace("'", '"').replace("##", '\\"').replace("###", "'"),
             strict=False,
         )
     except Exception as ex:
