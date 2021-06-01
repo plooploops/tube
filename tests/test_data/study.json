@@ -1240,5 +1240,23 @@
         "study_setup": "0525da74da", 
         "submitter_id": "study_4572279d80", 
         "type": "study"
+    }, 
+    {
+        "data_description": "", 
+        "is_clinical_trial": false, 
+        "projects": {
+            "code": "jenkins"
+        }, 
+        "study_completeness": "", 
+        "study_description": "This is some test data", 
+        "study_design": "", 
+        "study_doi": "", 
+        "study_objective": "", 
+        "study_organization": "", 
+        "study_release_date": "", 
+        "study_release_version": "", 
+        "study_setup": "", 
+        "submitter_id": "", 
+        "type": "study"
     }
 ]
