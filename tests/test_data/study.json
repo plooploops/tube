@@ -1230,7 +1230,7 @@
             "code": "jenkins"
         }, 
         "study_completeness": "0", 
-        "study_description": "8d8a048b67", 
+        "study_description": "study desc", 
         "study_design": "c989c2ac9c", 
         "study_doi": "0ce43d27dc", 
         "study_objective": "0421c34ce7", 
@@ -1239,24 +1239,6 @@
         "study_release_version": "b381f5db2c", 
         "study_setup": "0525da74da", 
         "submitter_id": "study_4572279d80", 
-        "type": "study"
-    }, 
-    {
-        "data_description": "", 
-        "is_clinical_trial": false, 
-        "projects": {
-            "code": "jenkins"
-        }, 
-        "study_completeness": "", 
-        "study_description": "This is some test data", 
-        "study_design": "", 
-        "study_doi": "", 
-        "study_objective": "", 
-        "study_organization": "", 
-        "study_release_date": "", 
-        "study_release_version": "", 
-        "study_setup": "", 
-        "submitter_id": "", 
         "type": "study"
     }
 ]
