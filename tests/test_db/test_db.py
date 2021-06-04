@@ -42,4 +42,4 @@ def test_items_equal_db(filename, total, entries):
             assert len(keys_xy) != 0
 
             for key in keys_xy:
-                assert x[key] == y[key]
+                assert x[key] == y[key], (x[key], y[key])
