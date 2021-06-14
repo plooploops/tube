@@ -1,6 +1,6 @@
 
 {
-  "db_host": "db",
+  "db_host": "172.17.0.1",
   "db_username": "postgres",
   "db_password": "postgres",
   "db_database": "metadata_db"

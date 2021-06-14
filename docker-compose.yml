@@ -1,0 +1,74 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.2
+    container_name: elasticsearch
+    environment:
+      - cluster.name=elasticsearch-cluster
+      - bootstrap.memory_lock=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - devnet
+  tube:
+    build: .
+#&& pip install -e git+https://github.com/uc-cdis/cdisutils-test.git@1.0.0#egg=cdisutilstest
+    command: bash -c "python run_config.py && sleep 50 && python run_etl.py -s import && python run_etl.py -s transform && python -m pytest tests/"
+    networks:
+      - devnet
+    environment:
+      - DICTIONARY_URL=https://s3.amazonaws.com/dictionary-artifacts/ndhdictionary/master/schema.json
+      - ES_URL=elasticsearch
+      - ES_INDEX_NAME=etl
+      - HADOOP_URL=hdfs://spark:9000
+      - HADOOP_HOST=spark
+    volumes:
+      - ./tests/gen3/tube/creds.json:/usr/share/gen3/tube/creds.json
+      - ./tests/gen3/tube/etlMapping.yaml:/usr/share/gen3/tube/etlMapping.yaml
+      - ./tests/gen3/tube/user.yaml:/usr/share/gen3/tube/user.yaml
+#    depends_on:
+#      - spark
+#      - db_init
+#      - elasticsearch
+  spark:
+    image: "quay.io/cdis/gen3-spark:master"
+    command: bash -c "python run_config.py && hdfs namenode -format && hdfs --daemon start namenode && hdfs --daemon start datanode && yarn --daemon start resourcemanager && yarn --daemon start nodemanager && hdfs dfsadmin -safemode leave &&  hdfs dfs -mkdir /result && while true; do sleep 5; done"
+    expose:
+      - 22
+      - 8030
+      - 8031
+      - 8032
+      - 9000
+    networks:
+      - devnet
+    environment:
+      - HADOOP_URL=hdfs://0.0.0.0:9000
+      - HADOOP_HOST=0.0.0.0
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mypass
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: metadata_db
+    networks:
+      - devnet  
+  # ephemeral container to populate db
+  db_init:
+    image: postgres
+    depends_on:
+      - db
+    volumes:
+      - ./tests/metadata_db.sql:/tmp/metadata_db.sql
+    networks:
+      - devnet
+    command: psql -h db -d metadata_db -U postgres -f /tmp/metadata_db.sql
+    
+networks:
+  devnet:

@@ -20,15 +20,12 @@ RUN mkdir -p /usr/share/man/man7
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     openjdk-8-jdk-headless \
-    # dependency for pyscopg2 - which is dependency for sqlalchemy postgres engine
     libpq-dev \
     postgresql-client \
     wget \
     unzip \
     git \
-    # dependency for cryptography
     libffi-dev \
-    # dependency for cryptography
     libssl-dev \
     vim \
     curl \
@@ -77,6 +74,10 @@ ENV PATH=${SQOOP_HOME}/bin:${HADOOP_HOME}/sbin:$HADOOP_HOME/bin:${JAVA_HOME}/bin
 
 COPY requirements.txt /tube/
 RUN pip install --no-cache-dir -r /tube/requirements.txt
+
+COPY dev-requirements.txt /tube/
+RUN pip install --no-cache-dir -r /tube/dev-requirements.txt
+
 
 COPY . /tube
 WORKDIR /tube
