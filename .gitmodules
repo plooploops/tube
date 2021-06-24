@@ -1,3 +1,0 @@
-[submodule "compose-etl"]
-	path = compose-etl
-	url = git@github.com:uc-cdis/compose-etl.git
